@@ -1,4 +1,3 @@
 python BatteryStatePridictor.py create --workspace ../workspace --model_type soh --train_file B0005 --test_file B0005 --dataset_folder ../workspace/csv_data --epochs 100
 
-
 python BatteryStatePridictor.py generate
