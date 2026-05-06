@@ -7,6 +7,9 @@ import shutil
 import subprocess
 import yaml
 
+from soc_codegen.soc_codegen import SOCCodegen
+from soh_codegen.soh_codegen import SOHCodegen
+
 CONFIG_YAML="config.yaml"
 
 PROJECT_GEN_DIR_PREFIX = 'ProjGen_'
@@ -92,6 +95,62 @@ def generate_model_cpp(output_path, tflite2cpp_dir_path, model_file):
     os.chdir(cur_work_dir)
     return True
 
+def prepare_proj_resource(board_info, project_path, templates_path, vela_model_file, vela_model_cc_file, pattern_test_file, example_tmpl_dir, example_tmpl_proj):
+    print('copy resources to autogen project directory')
+
+    bsp_lib_src_path = os.path.join(templates_path, board_info[1], board_info[2], 'Library')
+    bsp_lib_dest_path = os.path.join(project_path, board_info[2],'Library')
+    print('copy bsp library to autogen project directory')
+    shutil.copytree(bsp_lib_src_path, bsp_lib_dest_path, dirs_exist_ok = True)    
+
+    bsp_thirdparty_src_path = os.path.join(templates_path, board_info[1], board_info[2], 'ThirdParty')
+    bsp_thirdparty_dest_path = os.path.join(project_path, board_info[2], 'ThirdParty')
+
+    bsp_thirdparty_tflite_micro_src_path = os.path.join(bsp_thirdparty_src_path, 'tflite_micro')
+    bsp_thirdparty_tflite_micro_dest_path = os.path.join(bsp_thirdparty_dest_path, 'tflite_micro') 
+    print('copy BSP ThirdParty tflite_micro ...')
+    shutil.copytree(bsp_thirdparty_tflite_micro_src_path, bsp_thirdparty_tflite_micro_dest_path, dirs_exist_ok = True)
+
+    bsp_thirdparty_fatfs_src_path = os.path.join(bsp_thirdparty_src_path, 'FatFs')
+    bsp_thirdparty_fatfs_dest_path = os.path.join(bsp_thirdparty_dest_path, 'FatFs') 
+    print('copy BSP ThirdParty FatFs ...')
+    shutil.copytree(bsp_thirdparty_fatfs_src_path, bsp_thirdparty_fatfs_dest_path, dirs_exist_ok = True)
+
+    bsp_thirdparty_openmv_src_path = os.path.join(bsp_thirdparty_src_path, 'openmv')
+    bsp_thirdparty_openmv_dest_path = os.path.join(bsp_thirdparty_dest_path, 'openmv')
+    print('copy BSP ThirdParty openmv ...')
+    shutil.copytree(bsp_thirdparty_openmv_src_path, bsp_thirdparty_openmv_dest_path, dirs_exist_ok = True)
+
+    bsp_thirdparty_ml_evk_src_path = os.path.join(bsp_thirdparty_src_path, 'ml-embedded-evaluation-kit')
+    bsp_thirdparty_ml_evk_dest_path = os.path.join(bsp_thirdparty_dest_path, 'ml-embedded-evaluation-kit')
+    print('copy BSP ThirdParty ml-embedded-evaluation-kit ...')
+    shutil.copytree(bsp_thirdparty_ml_evk_src_path, bsp_thirdparty_ml_evk_dest_path, dirs_exist_ok = True)
+
+    bsp_dest_path = os.path.join(project_path, board_info[2])
+    example_template_path = os.path.join(templates_path, board_info[1], board_info[0], example_tmpl_dir)
+    example_project_path = os.path.join(bsp_dest_path, 'SampleCode', 'MachineLearning')
+    example_project_src_path = os.path.join(example_template_path, example_tmpl_proj)
+
+    print(example_template_path)
+    print(example_project_src_path)
+    print(example_project_path)
+
+    print('copy example template project to autogen MachineLearning example folder')
+    example_project_path = os.path.join(example_project_path, example_tmpl_proj)
+    shutil.copytree(example_project_src_path, example_project_path, dirs_exist_ok = True)
+
+    print('copy example model file to autogen MachineLearning example folder')
+    example_project_model_cpp_file = os.path.join(example_project_path, 'Model', 'NN_Model_INT8.tflite.cpp')
+    example_project_model_dir = os.path.join(example_project_path, 'Model')
+    shutil.copyfile(vela_model_cc_file, example_project_model_cpp_file)
+    shutil.copy(vela_model_file, example_project_model_dir)
+
+    print('copy example test pattern file to autogen MachineLearning example folder')
+    example_project_pattern_dir = os.path.join(example_project_path, 'Pattern')
+    shutil.copy(pattern_test_file, example_project_pattern_dir)
+
+    return example_project_path
+
 # add project generate argument parser
 def add_generate_parser(subparsers, _):
     """Include parser for 'generate' subcommand"""
@@ -115,6 +174,7 @@ def project_generate(args):
     application_usage = conf['model_type']
     workspace_dir = conf['workspace']
     model_file = conf['model_file']
+    pattern_test_file = conf['model_test_data_file']
 
     if not application_usage in application:
         print("applicaiton not found!")
@@ -162,3 +222,18 @@ def project_generate(args):
     generate_model_cpp(workspace_dir, tflite2cpp_dir_path, os.path.abspath(vela_model_file_path)) 
     vela_model_cc_file = os.path.join(workspace_dir, vela_model_basename + '_vela.tflite.cc')
     print(vela_model_cc_file)
+
+    #prepare project resource
+    example_tmpl_dir = application_param["example_tmpl_dir"]
+    example_tmpl_proj = application_param["example_tmpl_proj"]
+
+    project_example_path = prepare_proj_resource(board_info, project_path, templates_path, vela_model_file_path, vela_model_cc_file, pattern_test_file, example_tmpl_dir, example_tmpl_proj)
+    print(project_example_path)
+
+    # Generate model.hpp/cpp or main.cpp
+    if application_usage == 'soc':
+        codegen = SOCCodegen.from_args(vela_model_file_path, project_example_path, vela_summary_file_path, app='soc')
+    elif application_usage == 'soh':
+        codegen = SOHCodegen.from_args(vela_model_file_path, project_example_path, vela_summary_file_path, app='soh')
+
+    codegen.code_gen()
