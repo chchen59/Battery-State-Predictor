@@ -180,6 +180,10 @@ def project_generate(args):
         print("applicaiton not found!")
         return
 
+    if os.path.exists(model_file) == False:
+        print("The model file didn't exist. Please run create command first")
+        return
+
     application_param = application[application_usage]
     templates_path = os.path.join(os.path.dirname(__file__), 'templates')
 
