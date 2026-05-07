@@ -245,7 +245,7 @@ def project_generate(args):
     os.remove(vela_model_file_path)
     os.remove(vela_model_cc_file)
 
-    conf.update({"project_path":project_example_path})
+    conf.update({"target_board":board_info[0], "project_path":project_example_path})
 
     with open(CONFIG_YAML, 'w') as file:
         # default_flow_style=False keeps the human-readable block format

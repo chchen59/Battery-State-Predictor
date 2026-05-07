@@ -1,4 +1,0 @@
-model_file: ../workspace/trained_model/BMS_SOH_INT8.tflite
-model_test_data_file: ../workspace/exported_test_data/SOH_test_data.h
-model_type: soh
-workspace: ../workspace
