@@ -48,8 +48,13 @@ def create_sequence_data(data_x, data_y):
 
 def SOCModel(workspace, dataset_path, train_data, test_data, epochs):
     dataset_files= []
-    dataset_files.append(train_data)
-    dataset_files.append(test_data)
+
+    for d in train_data:
+        dataset_files.append(d)    
+
+    if not test_data in dataset_files:
+        dataset_files.append(test_data)
+
     print(f"SOC model dataset {dataset_files}")
 
     sys.path.append(dataset_path)
@@ -66,9 +71,9 @@ def SOCModel(workspace, dataset_path, train_data, test_data, epochs):
     )
 
     # Prepare the training and testing data for model data handler to load the model input and output data.
-    train_data_test_names = [
-        train_data,
-    ]
+    train_data_test_names = []
+    for d in train_data:
+        train_data_test_names.append(d)    
 
     test_data_test_names = [
         test_data,
@@ -161,12 +166,12 @@ def SOCModel(workspace, dataset_path, train_data, test_data, epochs):
 
     # Load best model
     loaded_model = keras.models.load_model(workspace + '/trained_model/%s_best.keras' % experiment_name)
+    # Testing
+    results = loaded_model.evaluate(test_x_seq, test_y_seq)
+    print(results)
+
 
     if METRICS_SHOW == True:
-
-        # Testing
-        results = loaded_model.evaluate(test_x_seq, test_y_seq)
-        print(results)
 
         # Visualiztion
         # train loss
