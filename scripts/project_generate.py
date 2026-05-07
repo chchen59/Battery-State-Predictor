@@ -241,3 +241,15 @@ def project_generate(args):
         codegen = SOHCodegen.from_args(vela_model_file_path, project_example_path, vela_summary_file_path, app='soh')
 
     codegen.code_gen()
+
+    os.remove(vela_model_file_path)
+    os.remove(vela_model_cc_file)
+
+    conf.update({"project_path":project_example_path})
+
+    with open(CONFIG_YAML, 'w') as file:
+        # default_flow_style=False keeps the human-readable block format
+        yaml.dump(conf, file, default_flow_style=False)
+
+    print(f'Example project completed at {os.path.abspath(project_example_path)}')
+    return project_example_path

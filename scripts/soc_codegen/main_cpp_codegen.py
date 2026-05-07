@@ -12,10 +12,12 @@ def add_activation_size_section(sram_usage, flash_usage):
     return szWriteLine
 
 def add_model_load_section(sram_usage, flash_usage):
-    if flash_usage > FLASH_SIZE_LIMIT:
-        szWriteLine = '#define __LOAD_MODEL_FROM_SD__'
-    else :
-        szWriteLine = '//#define __LOAD_MODEL_FROM_SD__'
+#    if flash_usage > FLASH_SIZE_LIMIT:
+#        szWriteLine = '#define __LOAD_MODEL_FROM_SD__'
+#    else :
+#        szWriteLine = '//#define __LOAD_MODEL_FROM_SD__'
+    # Always enable __LOAD_MODEL_FROM_SD__
+    szWriteLine = '#define __LOAD_MODEL_FROM_SD__'
     return szWriteLine
 
 #parse vela summary file to get memory usage information

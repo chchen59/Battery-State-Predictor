@@ -53,3 +53,4 @@ def model_create(args):
         with open(CONFIG_YAML, 'w') as file:
             # default_flow_style=False keeps the human-readable block format
             yaml.dump(conf_data, file, default_flow_style=False)
+    return model_file
