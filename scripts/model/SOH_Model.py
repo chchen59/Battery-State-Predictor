@@ -252,7 +252,7 @@ def SOHModel(workspace, dataset_path, train_data, test_data, epochs):
 
             def write_array_to_c(arr, array_name):
                 slice_start = 0  # Adjust the starting position of the slice according to actual needs.
-                slice_size = 64  # Adjust the slice size according to actual needs.
+                slice_size = 32  # Adjust the slice size according to actual needs.
                 slice_arr = arr[slice_start: slice_start + slice_size, ...]
 
                 flat_arr = slice_arr.flatten()

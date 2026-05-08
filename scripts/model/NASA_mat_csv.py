@@ -1,5 +1,6 @@
 import datetime
 import pandas as pd
+import os
 from scipy.io import loadmat
 from pandas import DataFrame
 
@@ -85,6 +86,8 @@ def charge_data(battery): #similarly write a fn for charge data
                 'temperature_measured','current',
                 'voltage', 'time']) 
     return chdf
+
+os.makedirs('csv_data', exist_ok=True)
 
 for battery in mat_files:
     disch_df, cap_df = disch_data(battery)
