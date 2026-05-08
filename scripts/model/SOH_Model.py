@@ -137,7 +137,9 @@ def SOHModel(workspace, dataset_path, train_data, test_data, epochs):
 
     # Setup early stop and check point
     #es = EarlyStopping(monitor='val_loss', patience=50)
-    mc = ModelCheckpoint(workspace + '/trained_model/%s_best.keras' % experiment_name, 
+    best_model_file_path = '%s_best.keras' % experiment_name
+    best_model_file_path = os.path.join(workspace, 'trained_model', best_model_file_path)
+    mc = ModelCheckpoint(best_model_file_path, 
                                 save_best_only=True,
                                 monitor='val_loss')
 
@@ -149,15 +151,18 @@ def SOHModel(workspace, dataset_path, train_data, test_data, epochs):
                                     callbacks = [mc]
                                 )
 
-    model.save(workspace + '/trained_model/%s.keras' % experiment_name)
+    model_file_path = '%s.keras' % experiment_name
+    model_file_path = os.path.join(workspace, 'trained_model', model_file_path)
+    model.save(model_file_path)
 
     hist_df = pd.DataFrame(history.history)
-    hist_csv_file = workspace + '/trained_model/%s_history.csv' % experiment_name
-    with open(hist_csv_file, mode='w') as f:
+    hist_csv_file_path = '%s_history.csv' % experiment_name
+    hist_csv_file_path = os.path.join(workspace, 'trained_model', hist_csv_file_path)
+    with open(hist_csv_file_path, mode='w') as f:
         hist_df.to_csv(f)
 
     # Load best model
-    loaded_model = keras.models.load_model(workspace + '/trained_model/%s_best.keras' % experiment_name)
+    loaded_model = keras.models.load_model(best_model_file_path)
     # Testing
     results = loaded_model.evaluate(test_x, test_y)
     print(results)
@@ -228,7 +233,7 @@ def SOHModel(workspace, dataset_path, train_data, test_data, epochs):
     tflite_quant_model = converter.convert()
 
     # Save the model.
-    trained_INT8_model = workspace + '/trained_model/BMS_SOH_INT8.tflite'
+    trained_INT8_model = os.path.join(workspace, 'trained_model', 'BMS_SOH_INT8.tflite')
 
     with open(trained_INT8_model, 'wb') as f:
         f.write(tflite_quant_model)
@@ -266,7 +271,7 @@ def SOHModel(workspace, dataset_path, train_data, test_data, epochs):
                 # Declare the C array (using float as an example)
                 f.write(f"const float {array_name}[{length}] = {{\n")
                 
-                # Write the values ​​in batches to avoid compiler errors caused by single lines being too long (12 values ​​per line).
+                # Write the values in batches to avoid compiler errors caused by single lines being too long (12 values per line).
                 for i in range(0, length, 12):
                     chunk = flat_arr[i:i+12]
                     chunk_str = ", ".join([f"{val:.6f}" for val in chunk])
@@ -285,8 +290,8 @@ def SOHModel(workspace, dataset_path, train_data, test_data, epochs):
         print("Export completed!")
 
     # Export test_raw_x_seq and test_y_seq data to C header file for later use in C language development.
-    os.makedirs(workspace + '/exported_test_data', exist_ok=True)
-    export_test_data_file = workspace + '/exported_test_data/SOH_test_data.h'
+    os.makedirs(os.path.join(workspace, 'exported_test_data'), exist_ok=True)
+    export_test_data_file = os.path.join(workspace, 'exported_test_data', 'SOH_test_data.h')
     export_numpy_to_c_header(test_raw_x, test_y, filename=export_test_data_file)
 
     return (trained_INT8_model, export_test_data_file)

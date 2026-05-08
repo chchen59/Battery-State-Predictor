@@ -145,7 +145,10 @@ def SOCModel(workspace, dataset_path, train_data, test_data, epochs):
     model.compile(optimizer=opt, loss='huber', metrics=['mse', 'mae', 'mape', tf.keras.metrics.RootMeanSquaredError(name='rmse')])
 
     es = EarlyStopping(monitor='val_loss', patience=50)
-    mc = ModelCheckpoint(workspace + '/trained_model/%s_best.keras' % experiment_name, 
+
+    best_model_file_path = '%s_best.keras' % experiment_name
+    best_model_file_path = os.path.join(workspace, 'trained_model', best_model_file_path)
+    mc = ModelCheckpoint(best_model_file_path, 
                                 save_best_only=True, 
                                 monitor='val_loss')
     reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr=0.00001) # Halve the learning rate after 5 epochs of stagnation.
@@ -158,14 +161,18 @@ def SOCModel(workspace, dataset_path, train_data, test_data, epochs):
                                     callbacks = [es, mc, reduce_lr]
                                 )
 
-    model.save(workspace + '/trained_model/%s.keras' % experiment_name)
+    model_file_path = '%s.keras' % experiment_name
+    model_file_path = os.path.join(workspace, 'trained_model', model_file_path)
+    model.save(model_file_path)
+
     hist_df = pd.DataFrame(history.history)
-    hist_csv_file = workspace + '/trained_model/%s_history.csv' % experiment_name
-    with open(hist_csv_file, mode='w') as f:
+    hist_csv_file_path = '%s_history.csv' % experiment_name
+    hist_csv_file_path = os.path.join(workspace, 'trained_model', hist_csv_file_path)
+    with open(hist_csv_file_path, mode='w') as f:
         hist_df.to_csv(f)
 
     # Load best model
-    loaded_model = keras.models.load_model(workspace + '/trained_model/%s_best.keras' % experiment_name)
+    loaded_model = keras.models.load_model(best_model_file_path)
     # Testing
     results = loaded_model.evaluate(test_x_seq, test_y_seq)
     print(results)
@@ -238,7 +245,8 @@ def SOCModel(workspace, dataset_path, train_data, test_data, epochs):
     tflite_quant_model = converter.convert()
 
     # Save the model.
-    trained_INT8_model = workspace + '/trained_model/BMS_SOC_INT8.tflite'
+    trained_INT8_model = os.path.join(workspace, 'trained_model', 'BMS_SOC_INT8.tflite')
+
     with open(trained_INT8_model, 'wb') as f:
         f.write(tflite_quant_model)
 
@@ -292,8 +300,8 @@ def SOCModel(workspace, dataset_path, train_data, test_data, epochs):
             f.write("#endif // TEST_DATA_H\n")
 
     # Export test_raw_x_seq and test_y_seq data to C header file for later use in C language development.
-    os.makedirs(workspace + '/exported_test_data', exist_ok=True)
-    export_test_data_file = workspace + '/exported_test_data/SOC_test_data.h'
+    os.makedirs(os.path.join(workspace, 'exported_test_data'), exist_ok=True)
+    export_test_data_file = os.path.join(workspace, 'exported_test_data', 'SOC_test_data.h')
     export_numpy_to_c_header(test_raw_x_seq, test_y_seq, filename=export_test_data_file)
 
     return (trained_INT8_model, export_test_data_file)

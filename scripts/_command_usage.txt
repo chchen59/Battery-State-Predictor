@@ -1,7 +1,7 @@
-python BatteryStatePridictor.py create --workspace ../workspace --model_type soh --train_file B0005 B0006 --test_file B0005 --dataset_folder ../workspace/csv_data --epochs 100
+python BatteryStatePridictor.py create --workspace ..\workspace --model_type soh --train_file B0005 B0006 --test_file B0005 --dataset_folder ..\csv_data --epochs 300
 
 python BatteryStatePridictor.py generate
 python BatteryStatePridictor.py build
 python BatteryStatePridictor.py flash
 
-python BatteryStatePridictor.py deploy --workspace ../workspace --model_type soh --train_file B0005 B0006 --test_file B0005 --dataset_folder ../workspace/csv_data --epochs 100
+python BatteryStatePridictor.py deploy --workspace ..\workspace --model_type soc --train_file B0005 B0006 --test_file B0005 --dataset_folder ..\csv_data --epochs 10
