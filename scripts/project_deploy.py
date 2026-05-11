@@ -17,7 +17,7 @@ def add_deploy_parser(subparsers, _):
     parser.add_argument("--train_file", nargs="+", help="specify training dataset(csv) file", required=True)
     parser.add_argument("--test_file", help="specify test dataset(csv) file", required=True)
     parser.add_argument("--epochs", help="specify training epochs", type=int, default=100)
-    parser.add_argument("--board", help="specify target board name", default='NuMaker-M55M1')
+    parser.add_argument("--board", help="specify target board name", default='NuMaker-X-M55M1D')
     parser.add_argument("--model_arena_size", help="specify the size of arena cache memory in bytes", default='0')
     parser.add_argument("--vela_extra_option", help="specify vela extra options")
     parser.add_argument("--uv4_tool", help="specify UV4.exe path")

@@ -16,18 +16,18 @@ PROJECT_GEN_DIR_PREFIX = 'ProjGen_'
 
 board_list = [
     #board name, MCU, BSP name
-    ['NuMaker-M55M1', 'M55M1', 'M55M1BSP-3.01.004'],   
-    ['NuGestureAI-M55M1', 'M55M1', 'M55M1BSP-3.01.004'],   
+    ['NuMaker-X-M55M1D', 'M55M1', 'M55M1BSP-3.01.004'],   
+    #['NuGestureAI-M55M1', 'M55M1', 'M55M1BSP-3.01.004'],   
 ]
 
 application = {
     "soc"   : {
-                    "board": ['NuMaker-M55M1', 'NuGestureAI-M55M1'],
+                    "board": ['NuMaker-X-M55M1D', 'NuGestureAI-M55M1'],
                     "example_tmpl_dir": "soc_template",
                     "example_tmpl_proj": "BatterySOCEstimation"
                   },
     "soh"  : {
-                    "board": ['NuMaker-M55M1', 'NuGestureAI-M55M1'],
+                    "board": ['NuMaker-X-M55M1D', 'NuGestureAI-M55M1'],
                     "example_tmpl_dir": "soh_template",
                     "example_tmpl_proj": "BatterySOHEstimation"
                   },
@@ -156,7 +156,7 @@ def add_generate_parser(subparsers, _):
     """Include parser for 'generate' subcommand"""
     parser = subparsers.add_parser("generate", help="generate ml project")
     parser.set_defaults(func=project_generate)
-    parser.add_argument("--board", help="specify target board name", default='NuMaker-M55M1')
+    parser.add_argument("--board", help="specify target board name", default='NuMaker-X-M55M1D')
     parser.add_argument("--model_arena_size", help="specify the size of arena cache memory in bytes", default='0')
     parser.add_argument("--vela_extra_option", help="specify vela extra options")
 

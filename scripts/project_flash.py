@@ -9,7 +9,7 @@ CONFIG_YAML="config.yaml"
 board_list = [
     #board name, MCU, NuLinkTool
     ['NuMaker-M467HJ', 'M467', 'NuLink_M460_M2L31.exe'],
-    ['NuMaker-M55M1', 'M55M1', 'M55M1_M5531\\NuLink.exe'],
+    ['NuMaker-X-M55M1D', 'M55M1', 'M55M1_M5531\\NuLink.exe'],
     ['NuGestureAI-M55M1', 'M55M1', 'M55M1_M5531\\NuLink.exe'],
 ]
 
