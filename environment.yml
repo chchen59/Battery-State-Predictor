@@ -1,4 +1,4 @@
-name: E:\CondaEnv\Battery_State_Estimation
+name: Battery_State_Predictor
 channels:
   - defaults
   - https://repo.anaconda.com/pkgs/main
@@ -74,4 +74,4 @@ dependencies:
       - werkzeug==3.1.5
       - winregistry==2.1.5
       - wrapt==2.1.1
-prefix: E:\CondaEnv\Battery_State_Estimation
+prefix: Battery_State_Predictor

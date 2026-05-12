@@ -1,5 +1,5 @@
 # Battery State Predictor
-An end-to-end machine learning framework designed for training, generating, and deploying Battery State of Charge (SOC) and State of Health (SOH) estimation models to embedded devices. This project provides a streamlined pipeline from data processing and model training (using Keras/TensorFlow) to automated C++ code generation and hardware flashing for the Nuvoton NuMaker-X-M55M1D board equipped with an M55M1 Ethos-U NPU.
+An end-to-end machine learning framework designed for training, generating, and deploying Battery State of Charge (SOC) and State of Health (SOH) estimation models to embedded devices. This project provides a streamlined pipeline from data processing and model training (using Keras/TensorFlow) to automated C++ code generation and hardware flashing for the Nuvoton NuMaker-X-M55M1D board equipped with the M55M1 Ethos-U NPU.
 
 ## Key Features
 * Deep Learning Models: Purpose-built neural network architectures for predicting battery SOC and SOH.
@@ -47,25 +47,49 @@ To run the pipeline smoothly on a Windows environment, ensure the following are 
 * Keil MDK (uVision 5) for compiling the M55M1 .uvprojx projects.
 * Nuvoton Nu-Link Driver for flashing the firmware to the NuMaker board.
 
+To ensure a consistent Python environment, it is recommended to create a Python environment from the `Conda environment YAML` file on Anaconda or Miniforge.
+```
+conda env create -f environment.yml
+```
+
 ## Usage
 The repository uses a modular script system to manage the lifecycle of the battery state estimator. While full command-line arguments example can be found in `_command_usage.txt`, the general pipeline follows these steps:
 1. Data Preparation and Model Training:  
 Specify workspace, NASA dataset path and .csv files (e.g., B0005). The system will convert them and train the networks.
+    * Parameter
+        * workspace: Output directory path for model and target project generation.
+        * model_type: Specify the model type
+            * soc
+            * soh
+        * dataset_folder: Specify the dataset folder
+        * train_file: Specify training dataset(csv) files
+        * test_file: Specify test dataset(csv) file
+        * epochs [option]: Training epochs
+
+```
+cd scripts
+```
 ```
 python BatteryStatePridictor.py create --workspace ..\workspace --model_type soh --train_file B0005 B0006 --test_file B0005 --dataset_folder ..\csv_data --epochs 300
 ```
 2. Code Generation:  
 Once the `.tflite` model is generated, run the project generator. This invokes the Jinja2 templates in soc_codegen or soh_codegen to bind the TFLite operations into the embedded C++ wrappers (`NNModel.cpp`).
+    * Parameter
+        * model_arena_size [option]: Specify the size of arena cache memory in bytes
 ```
 python BatteryStatePridictor.py generate
 ```
 3. Building the Firmware:  
 Invoke the build script, which interfaces with Keil uVision in the background to compile the M55M1 firmware alongside the Ethos-U driver stack.
+    * Parameter
+        * uv4_tool [option]: UV4.exe path
 ```
 python BatteryStatePridictor.py build
 ```
 4. Flashing to Hardware:  
 Connect the NuMaker-X-M55M1D board via USB and flash the compiled binary directly to the device.
+    * Parameter
+        * binary_file [option]: Specify the binary file of project
 ```
 python BatteryStatePridictor.py flash
 ```
