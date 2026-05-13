@@ -93,3 +93,6 @@ Connect the NuMaker-X-M55M1D board via USB and flash the compiled binary directl
 ```
 python BatteryStatePridictor.py flash
 ```
+## READMEs
+* [Dataset Description](scripts/model/data/README.md)
+* [Model Architecture](scripts/model/README.md)
