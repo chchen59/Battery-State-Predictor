@@ -63,7 +63,7 @@ python BatteryStatePridictor.py create ... --model_type soc ...
 ```
 ## Result
 ### SOH 
-MAE (Mean Absolute Error): 0.0179 @ epoch 300 
+MAE (Mean Absolute Error): 0.0422 @ epoch 300 
 ![SOH](./Picture/SOH_Test_MAE_0_0422.png)
 ### SOC
 MAE: 0.0218 @ epoch 10
