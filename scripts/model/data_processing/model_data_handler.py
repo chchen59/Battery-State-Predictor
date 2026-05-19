@@ -53,9 +53,9 @@ class ModelDataHandler():
         )
 
         train_scaled_x = self.__get_scaled_whole_cycle_x(
-            train_raw_x, self.discharge_scalers)
+            train_raw_x, self.charge_scalers)
         test_scaled_x = self.__get_scaled_whole_cycle_x(
-            test_raw_x, self.discharge_scalers)
+            test_raw_x, self.charge_scalers)
 
         train_x, test_x = self.__get_padded_whole_cycle(
             train_scaled_x, test_scaled_x)

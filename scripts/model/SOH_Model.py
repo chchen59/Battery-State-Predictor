@@ -117,15 +117,7 @@ def SOHModel(workspace, dataset_path, train_data, test_data, epochs):
     x = layers.Conv1D(64, 32, activation='relu')(x)
     x = layers.MaxPooling1D(pool_size = 2)(x)
 
-    x = layers.Conv1D(64, 32, activation='relu')(x)
-    x = layers.MaxPooling1D(pool_size = 2)(x)
-
-    x = layers.Conv1D(32, 16, activation='relu')(x)
-    x = layers.MaxPooling1D(pool_size = 2)(x)
-
-
-    x = layers.Flatten()(x)
-    x = layers.Dense(1024, activation='relu')(x)
+    x = layers.GlobalAveragePooling1D()(x)
     x = layers.Dense(256, activation='relu')(x)
     output = layers.Dense(1, activation='relu')(x)
 
@@ -221,7 +213,7 @@ def SOHModel(workspace, dataset_path, train_data, test_data, epochs):
 
     # Convert to INT8 tflite model.
     def representative_dataset():
-        for input_value in tf.data.Dataset.from_tensor_slices((train_x)).batch(1).take(1000):
+        for input_value in tf.data.Dataset.from_tensor_slices((train_x)).batch(1).take(100):
             yield [input_value]
 
     converter = tf.lite.TFLiteConverter.from_keras_model(loaded_model)
@@ -257,8 +249,8 @@ def SOHModel(workspace, dataset_path, train_data, test_data, epochs):
 
             def write_array_to_c(arr, array_name):
                 slice_start = 0  # Adjust the starting position of the slice according to actual needs.
-                slice_size = 32  # Adjust the slice size according to actual needs.
-                slice_arr = arr[slice_start: slice_start + slice_size, ...]
+                slice_size = 20 * 5  # Adjust the slice size according to actual needs.
+                slice_arr = arr[slice_start: slice_start + slice_size:  5, ...]
 
                 flat_arr = slice_arr.flatten()
                 length = len(flat_arr)

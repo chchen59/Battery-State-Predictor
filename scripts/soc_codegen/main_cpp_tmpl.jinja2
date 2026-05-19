@@ -60,9 +60,9 @@ extern size_t GetModelLen();
 static int32_t PrepareModelToHyperRAM(void)
 {
 #if !defined(__USE_SD1__)
-#define MODEL_FILE "0:\\nn_model.tflite"
+#define MODEL_FILE "0:\\BMS_SOC_INT8_vela.tflite"
 #else
-#define MODEL_FILE "1:\\nn_model.tflite"
+#define MODEL_FILE "1:\\BMS_SOC_INT8_vela.tflite"
 #endif
 
 #define EACH_READ_SIZE 512
@@ -140,7 +140,7 @@ int main()
     int32_t i32ModelSize;
 
     printf("==================== Load model file from SD card =================================\n");
-    printf("Please copy NN_ModelInference/Model/xxx_vela.tflite to SDCard:/nn_model.tflite     \n");
+    printf("Please copy BatterySOCEstimation/Model/xxx_vela.tflite to SDCard:/BMS_SOC_INT8_vela.tflite     \n");
     printf("===================================================================================\n");
     i32ModelSize = PrepareModelToHyperRAM();
 
@@ -226,13 +226,18 @@ int main()
     //time steps * (Voltage, Current, Temperature, SOH)
     int32_t i32InputDataSize = test_x_seq_dim[1] * test_x_seq_dim[2];
     int32_t i32InputDataIndex = 0;
+    int32_t i32Samples = test_x_seq_dim[1];
     int32_t i32InputDataItems = test_x_seq_dim[2];
     int32_t i32OutputDataIndex = 0;
     int32_t i32Cycle = 0;
     int32_t i32ToatlCycles = test_x_seq_dim[0];
     //Summation of absolute error
     float fPredicAbsErrorSum = 0.;
-    float fInputData;
+
+    float fVoltageInputData;
+    float fCurrentInputData;
+    float fTemperInputData;
+    float fSOHInputData;
 
     std::vector<float> vNormScale;
 
@@ -243,18 +248,37 @@ int main()
 
     while (i32Cycle < i32ToatlCycles)
     {
-        //Quantize input tensor data. set all input vaule to 0.5
+        //Normalize and Quantize input tensor data.
         auto *signed_req_data = static_cast<int8_t *>(inputTensor->data.data);
-        for (size_t i = 0; i < inputTensor->bytes; i++)
+
+        for (size_t i = 0; i < i32Samples; i++)
         {
-            fInputData = pfInputTestData[i32InputDataIndex + i];
-            //If the input data is raw data, perform the normalize step.
-            fInputData = (fInputData - normalize_scale_min[i % i32InputDataItems]) / (vNormScale[i % i32InputDataItems]);
+            fVoltageInputData = pfInputTestData[i32InputDataIndex + (i * i32InputDataItems)];
+            fCurrentInputData = pfInputTestData[i32InputDataIndex + (i * i32InputDataItems) + 1];
+            fTemperInputData = pfInputTestData[i32InputDataIndex + (i * i32InputDataItems) + 2];
+            fSOHInputData = pfInputTestData[i32InputDataIndex + (i * i32InputDataItems) + 3];
 
-  					auto i_data_int8 = static_cast<int8_t>(((fInputData) / inQuantParams.scale) + inQuantParams.offset);
-            signed_req_data[i] = std::min<int8_t>(INT8_MAX, std::max<int8_t>(i_data_int8, INT8_MIN));
+            if((fVoltageInputData != 0.0) && (fCurrentInputData != 0.0) && (fTemperInputData != 0.0))
+            {
+                fVoltageInputData = (fVoltageInputData - normalize_scale_min[0]) / (vNormScale[0]);
+                fCurrentInputData = (fCurrentInputData - normalize_scale_min[1]) / (vNormScale[1]);
+                fTemperInputData = (fTemperInputData - normalize_scale_min[2]) / (vNormScale[2]);
+                fSOHInputData = (fSOHInputData - normalize_scale_min[3]) / (vNormScale[3]);
+            }
+
+            auto i_data_int8 = static_cast<int8_t>(((fVoltageInputData) / inQuantParams.scale) + inQuantParams.offset);
+            signed_req_data[(i * i32InputDataItems)] = std::min<int8_t>(INT8_MAX, std::max<int8_t>(i_data_int8, INT8_MIN));						
+
+            i_data_int8 = static_cast<int8_t>(((fCurrentInputData) / inQuantParams.scale) + inQuantParams.offset);
+            signed_req_data[(i * i32InputDataItems) + 1] = std::min<int8_t>(INT8_MAX, std::max<int8_t>(i_data_int8, INT8_MIN));						
+
+            i_data_int8 = static_cast<int8_t>(((fTemperInputData) / inQuantParams.scale) + inQuantParams.offset);
+            signed_req_data[(i * i32InputDataItems) + 2] = std::min<int8_t>(INT8_MAX, std::max<int8_t>(i_data_int8, INT8_MIN));						
+
+            i_data_int8 = static_cast<int8_t>(((fSOHInputData) / inQuantParams.scale) + inQuantParams.offset);
+            signed_req_data[(i * i32InputDataItems) + 3] = std::min<int8_t>(INT8_MAX, std::max<int8_t>(i_data_int8, INT8_MIN));						
+
         }
-
         i32InputDataIndex += i32InputDataSize;
 
 #if defined(__PROFILE__)
@@ -296,10 +320,10 @@ int main()
 
             for(int j =0; j < outputTensor->bytes; j ++)
             {
-                fPredicData = outputQuantParams.scale * static_cast<float>(tensorOutputData[i] - outputQuantParams.offset);
+                fPredicData = outputQuantParams.scale * static_cast<float>(tensorOutputData[j] - outputQuantParams.offset);
                 fPredicAbsErrorSum += std::abs(pfOutputTestData[i32OutputDataIndex] - fPredicData);
                 i32OutputDataIndex ++;
-                info("Tensor output[%d][%d]: %f\n",i,j, fPredicData);
+                info("Tensor output[%d][%d]: %f\n",i32Cycle,j, fPredicData);
             }
         }
 
