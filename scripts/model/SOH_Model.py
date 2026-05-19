@@ -26,7 +26,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint, LambdaCallback
 from model.data_processing.NASA_data import NASAData, ChargeCycleCols, DischargeCycleCols
 from model.data_processing.model_data_handler import ModelDataHandler
 
-METRICS_SHOW = False
+METRICS_SHOW = True
 
 def SOHModel(workspace, dataset_path, train_data, test_data, epochs):
     dataset_files= []
