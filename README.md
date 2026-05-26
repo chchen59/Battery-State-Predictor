@@ -46,10 +46,19 @@ To run the pipeline smoothly on a Windows environment, ensure the following are 
 * Python 3.10+ (with numpy, tensorflow/keras, jinja2, and pyyaml)
 * Keil MDK (uVision 5) for compiling the M55M1 .uvprojx projects.
 * Nuvoton Nu-Link Driver for flashing the firmware to the NuMaker board.
+* Miniforge
 
-To ensure a consistent Python environment, it is recommended to create a Python environment from the `Conda environment YAML` file on Anaconda or Miniforge.
+## Miniforge installation
+To install Miniforge, download the installer for windows system from the [Conda-Forge Download Page](https://conda-forge.org/download/) or the [GitHub Releases Page](https://github.com/conda-forge/miniforge/releases).
+
+1. Download the latest Windows executable (usually Miniforge3-Windows-x86_64.exe) from the Conda-Forge Download Page.
+2. Double-click the `.exe` file to launch the installation wizard.
+3. Follow the prompts. It is highly recommended to uncheck "Register Miniforge3 Python as my default Python" if you already have another Python installation on your system.
+4. Once completed, use the "Miniforge Prompt" from your start menu to access the conda and mamba tools.
+5. To ensure a consistent Python environment, it is recommended to create a Python environment from the `Conda environment YAML` file on Miniforge.
 ```
 conda env create -f environment.yml
+conda activate Battery_State_Predictor
 ```
 
 ## Usage
