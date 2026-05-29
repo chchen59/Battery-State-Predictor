@@ -105,3 +105,11 @@ python BatteryStatePridictor.py flash
 ## READMEs
 * [Dataset Description](scripts/model/data/README.md)
 * [Model Architecture](scripts/model/README.md)
+
+## Enable Windows Long Paths
+If you frequently encounter "Path too long" errors when downloading or extracting files, you can increase the system limit beyond 260 characters using the Registry.
+1. Press `Win` + `R`, type `regedit`, and hit Enter.
+2. Navigate to: `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem`
+3. Find the `LongPathsEnabled` value. (If it doesn't exist, right-click inside the right pane, select New > DWORD (32-bit) Value, and name it `LongPathsEnabled`).
+4. Double-click it and set the Value data to `1`.
+5. Click OK and restart your PC.
