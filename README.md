@@ -14,7 +14,7 @@ Battery-State-Predictor/
 ├── csv_data/                        # Battery dataset (csv format)
 ├── NuLink Command Tool/             # Target firmware flashing tool for NuMicro MCUs
 ├── scripts/
-│   ├── BatteryStatePridictor.py     # Main CLI entry point for the prediction pipeline
+│   ├── BatteryStatePredictor.py     # Main CLI entry point for the prediction pipeline
 │   ├── config.yaml                  # Global configuration parameters (auto generation)
 │   ├── model_create.py              # Triggers the SOC/SOH model training processes
 │   ├── project_generate.py          # Generates MCU project files using TFLite models
@@ -79,28 +79,28 @@ Specify workspace, NASA dataset path and .csv files (e.g., B0005). The system wi
 cd scripts
 ```
 ```
-python BatteryStatePridictor.py create --workspace ..\workspace --model_type soh --train_file B0005 B0006 --test_file B0005 --dataset_folder ..\csv_data --epochs 300
+python BatteryStatePredictor.py create --workspace ..\workspace --model_type soh --train_file B0005 B0006 --test_file B0005 --dataset_folder ..\csv_data --epochs 300
 ```
 2. Code Generation:  
 Once the `.tflite` model is generated, run the project generator. This invokes the Jinja2 templates in soc_codegen or soh_codegen to bind the TFLite operations into the embedded C++ wrappers (`NNModel.cpp`).
     * Parameter
         * model_arena_size [option]: Specify the size of arena cache memory in bytes
 ```
-python BatteryStatePridictor.py generate
+python BatteryStatePredictor.py generate
 ```
 3. Building the Firmware:  
 Invoke the build script, which interfaces with Keil uVision in the background to compile the M55M1 firmware alongside the Ethos-U driver stack.
     * Parameter
         * uv4_tool [option]: UV4.exe path
 ```
-python BatteryStatePridictor.py build
+python BatteryStatePredictor.py build
 ```
 4. Flashing to Hardware:  
 Connect the NuMaker-X-M55M1D board via USB and flash the compiled binary directly to the device.
     * Parameter
         * binary_file [option]: Specify the binary file of project
 ```
-python BatteryStatePridictor.py flash
+python BatteryStatePredictor.py flash
 ```
 ## READMEs
 * [Dataset Description](scripts/model/data/README.md)

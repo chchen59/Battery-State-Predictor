@@ -51,15 +51,15 @@ mat_files = ['B0005', 'B0006', 'B0007'] #list of .mat files to be converted to c
 3. Execute `python NASA_mat_csv.py`. It will convert mat to csv file format and output to  `./csv_data` folder.  
 ### Execution
 Predict SOH:  
-Using `BatteryStatePridictor.py` create command for SOH model
+Using `BatteryStatePredictor.py` create command for SOH model
 ```bash
-python BatteryStatePridictor.py create ... --model_type soh ...
+python BatteryStatePredictor.py create ... --model_type soh ...
 ```
 
 Predict SOC:  
-Using `BatteryStatePridictor.py` create command for SOC model
+Using `BatteryStatePredictor.py` create command for SOC model
 ```bash
-python BatteryStatePridictor.py create ... --model_type soc ...
+python BatteryStatePredictor.py create ... --model_type soc ...
 ```
 ## Result
 ### SOH 
