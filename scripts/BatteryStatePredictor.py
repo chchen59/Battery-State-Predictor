@@ -15,7 +15,7 @@ def register_parser(make_subparser):
     """
     Utility function to register a subparser for TFLM.
 
-    Functions decorated with `BatteryStatePridictor.project_xxx.add_xxx_parser` will be invoked
+    Functions decorated with `BatteryStatePredictor.project_xxx.add_xxx_parser` will be invoked
     with a parameter containing the subparser instance they need to add itself to,
     as a parser.
 
@@ -32,12 +32,12 @@ def register_parser(make_subparser):
     return make_subparser
 
 def _main(argv):
-    """BatteryStatePridictor command line interface."""
+    """BatteryStatePredictor command line interface."""
 
     parser = argparse.ArgumentParser(
-        prog="battery-state-pridictor",
+        prog="battery-state-predictor",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        description="Battert state pridictor for SOH/SOC",
+        description="Battery state predictor for SOH/SOC",
         epilog=__doc__,
         # Help action will be added later, after all subparsers are created,
         # so it doesn't interfere with the creation of the dynamic subparsers.
