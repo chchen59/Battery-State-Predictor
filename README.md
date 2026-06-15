@@ -44,8 +44,8 @@ Battery-State-Predictor/
 ## Prerequisites
 To run the pipeline smoothly on a Windows environment, ensure the following are installed:
 * Python 3.10+ (with numpy, tensorflow/keras, jinja2, and pyyaml)
-* Keil MDK (uVision 5) for compiling the M55M1 .uvprojx projects.
-* Nuvoton Nu-Link Driver for flashing the firmware to the NuMaker board.
+* [Keil MDK](https://www.nuvoton.com/tool-and-software/ide-and-compiler/keil-download/) (uVision 5) for compiling the M55M1 .uvprojx projects.
+* [Nuvoton Nu-Link Driver](https://www.nuvoton.com/tool-and-software/ide-and-compiler/index.html) for flashing the firmware to the NuMaker board.
 * Miniforge
 
 ## Miniforge installation
@@ -105,6 +105,41 @@ python BatteryStatePredictor.py flash
 ## READMEs
 * [Dataset Description](scripts/model/data/README.md)
 * [Model Architecture](scripts/model/README.md)
+
+## Workflows
+The following steps explain how to build the SOH/SOC models step by step and deploy them to the M55M1.
+1. Clone the entire Battery State Predictor project with `git clone`, then follow the [Miniforge installation](#miniforge-installation) section above to create and activate the Python environment.
+
+![conda_activate](./pictures/conda_activate.png)
+
+2. Prepare the NASA-format dataset containing battery current, voltage, and temperature data, then use the `create` command to train the model. Refer to step 1 in [Usage](#usage). Model training may take some time, so please wait patiently.
+
+   After training completes, you can review the result shown below and check the final MAE (Mean Absolute Error) for test dataset. The trained model will be placed in your workspace folder.
+
+![test_MAE](./pictures/test_mae.png)
+
+![test_MAE](./pictures/trained_model.png)
+
+
+3. Once the model has been created, use the `generate` command to produce the Keil project for SOH/SOC model inference. Refer to step 2 in [Usage](#usage). The generated project will be placed under the `workspace` directory you specified. You can open the project .uvprojx file directly in Keil to build and flash it, or use the following commands to build and flash it.
+
+![project](./pictures/project.png)
+
+4. Use the `build` command to compile the Keil project for SOH/SOC model inference. Refer to step 3 in [Usage](#usage).
+
+![build](./pictures/build_done.png)
+
+5. Connect the PC and Nu-Link2 using a USB cable, then use the `flash` command to program the compiled binary file. Refer to step 4 in [Usage](#usage).
+
+![flash](./pictures/program_flash.png)
+![flash_done](./pictures/flash_done.png)
+
+## Result
+Because the NuMaker-X-M55M1D does not include battery current, voltage, or temperature sensing modules, the project uses part of the dataset to infer the SOH/SOC estimation values and then calculates the MAE against the actual values in the dataset. A smaller MAE is better. The inferred result should be close to the values described in [Model Architecture](scripts/model/README.md) (SOH: 0.0422(4.22%), SOC: 0.0218(2.18%)).
+
+Open a terminal program such as TeraTerm, and set the USB serial port to 115200:8-n-1. The result is shown below.
+
+![inf_result](./pictures/inference_result.png)
 
 ## Enable Windows Long Paths
 If you frequently encounter "Path too long" errors when downloading or extracting files, you can increase the system limit beyond 260 characters using the Registry.
