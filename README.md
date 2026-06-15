@@ -106,7 +106,7 @@ python BatteryStatePredictor.py flash
 * [Dataset Description](scripts/model/data/README.md)
 * [Model Architecture](scripts/model/README.md)
 
-## Workflows
+## Workflow
 The following steps explain how to build the SOH/SOC models step by step and deploy them to the M55M1.
 1. Clone the entire Battery State Predictor project with `git clone`, then follow the [Miniforge installation](#miniforge-installation) section above to create and activate the Python environment.
 
