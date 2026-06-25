@@ -45,7 +45,7 @@ Battery-State-Predictor/
 To run the pipeline smoothly on a Windows environment, ensure the following are installed:
 * Python 3.10+ (with numpy, tensorflow/keras, jinja2, and pyyaml)
 * [Keil MDK](https://www.nuvoton.com/tool-and-software/ide-and-compiler/keil-download/) (uVision 5) for compiling the M55M1 .uvprojx projects.
-* [Nuvoton Nu-Link Driver](https://www.nuvoton.com/tool-and-software/ide-and-compiler/index.html) for flashing the firmware to the NuMaker board.
+* [Nuvoton Nu-Link_Keil_Driver](https://www.nuvoton.com/tool-and-software/ide-and-compiler/index.html) for flashing the firmware to the NuMaker board.
 * Miniforge
 
 ## Miniforge installation
@@ -129,7 +129,7 @@ The following steps explain how to build the SOH/SOC models step by step and dep
 
 ![build](./pictures/build_done.png)
 
-5. Connect the PC and Nu-Link2 using a USB cable, then use the `flash` command to program the compiled binary file. Refer to step 4 in [Usage](#usage).
+5. Connect the PC and Nu-Link2 using a USB cable, then use the `flash` command to program the compiled binary file. Refer to step 4 in [Usage](#usage). After the program is burned, you can use the USB serial port to check the results running on the M55M1 as described in the [Result](#result) section.
 
 ![flash](./pictures/program_flash.png)
 ![flash_done](./pictures/flash_done.png)
@@ -137,7 +137,7 @@ The following steps explain how to build the SOH/SOC models step by step and dep
 ## Result
 Because the NuMaker-X-M55M1D does not include battery current, voltage, or temperature sensing modules, the project uses part of the dataset to infer the SOH/SOC estimation values and then calculates the MAE against the actual values in the dataset. A smaller MAE is better. The inferred result should be close to the values described in [Model Architecture](scripts/model/README.md) (SOH: 0.0422(4.22%), SOC: 0.0218(2.18%)).
 
-Open a terminal program such as TeraTerm, and set the USB serial port to 115200:8-n-1. The result is shown below.
+Open a terminal program such as TeraTerm, and set the USB serial port to `baud rate 115200`, `8 data bits`, `no parity` and `1 stop bit`. The result is shown below.
 
 ![inf_result](./pictures/inference_result.png)
 
